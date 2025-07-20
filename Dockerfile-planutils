@@ -22,7 +22,7 @@ CMD /bin/bash
 # docker build --rm  --tag myplanutils . --file Dockerfile-planutils
 
 # To to run the built image
-# docker run -v "/c/Users/ivan2/Desktop/Uni/automated-planning/Project/automated-healthcare-robot-planning/problem-1:/computer" -it --privileged --rm myplanutils bash
+# docker run -v "/home/ivan/automated-healthcare-robot-planning/problem-1:/computer" -it --privileged --rm myplanutils bash
 
 # Alternatively, you can use the following command to run the image if the above command does not work
 # docker run  -v.:/computer -it --privileged --rm docker.io/library/myplanutils bash
