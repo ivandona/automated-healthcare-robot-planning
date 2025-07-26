@@ -1,45 +1,43 @@
 (define (domain healthcare-delivery)
 
-  (:requirements :strips)
+  (:requirements :strips :typing)
 
-  ;; --- TYPE PREDICATES ---
+  (:types
+    robot box content location patient - object
+    carrier-robot escort-robot - robot
+    aspirin scalpel tongue-depressor - content
+  )
+
   (:predicates
-    (robot ?r)
-    (carrier-robot ?r)
-    (escort-robot ?r)
-    (box ?b)
-    (content ?c)
-    (patient ?p)
-    (unit ?u)
-    (location ?l)
+    ;; --- Is content of type ... ---
+    (is-aspirin ?c - content)
+    (is-tongue-depressor ?c - content)
+    (is-scalpel ?c - content)
 
     ;; --- Location & Connection ---
-    (at ?x ?l) ; for robots, boxes, patients
-    (connected ?from ?to)
+    (at ?x - object ?l - location)
+    (connected ?from - location ?to - location)
 
     ;; --- Box State ---
-    (has-content ?b ?c)
-    (empty ?b)
-    (carrying ?r ?b)
-
+    (has-content ?b - box  ?c - content)
+    (empty ?b - box)
+    (carrying ?r - carrier-robot ?b - box)
+    
     ;; --- Escorting Patients ---
-    (accompanying ?r ?p)
+    (accompanying ?r - escort-robot ?p - patient)
 
-    ;; --- Unit Associations & Inventory ---
-    (at-unit ?u ?l)
-    (unit-has ?u ?c)
+    (empty-handed ?r - robot)
 
     ;; --- Delivered status (for goals) ---
-    (patient-at-unit ?p ?u)
+    (patient-at-unit ?p - patient ?u - location)
   )
 
   ;; --- ACTIONS ---
 
   ;; Robot Movement
   (:action move
-    :parameters (?r ?from ?to)
+    :parameters (?r - robot ?from - location ?to - location)
     :precondition (and
-      (robot ?r)
       (at ?r ?from)
       (connected ?from ?to)
     )
@@ -49,43 +47,72 @@
     )
   )
 
+  (:action move-with-box
+    :parameters (?r - carrier-robot ?b - box ?from - location ?to - location)
+    :precondition (and
+      (at ?r ?from)
+      (at ?b ?from)
+      (connected ?from ?to)
+      (carrying ?r ?b)
+    )
+    :effect (and
+      (at ?r ?to)
+      (not (at ?r ?from))
+      (at ?b ?to)
+      (not (at ?b ?from))
+    )
+  )
+
+  (:action move-with-patient
+    :parameters (?r - escort-robot ?p - patient ?from - location ?to - location)
+    :precondition (and
+      (at ?r ?from)
+      (at ?p ?from)
+      (connected ?from ?to)
+      (accompanying ?r ?p)
+    )
+    :effect (and
+      (at ?r ?to)
+      (not (at ?r ?from))
+      (at ?p ?to)
+      (not (at ?p ?from))
+    )
+  )
+
   ;; Carrying a box
   (:action pickup-box
-    :parameters (?r ?b ?l)
+    :parameters (?r - carrier-robot ?b - box ?l - location)
     :precondition (and
-      (carrier-robot ?r)
-      (box ?b)
       (at ?r ?l)
       (at ?b ?l)
+      (empty-handed ?r)
     )
     :effect (and
       (carrying ?r ?b)
-      (not (at ?b ?l))
+      (not (empty-handed ?r))
     )
   )
 
   (:action drop-box
-    :parameters (?r ?b ?l)
+    :parameters (?r - carrier-robot ?b - box ?l - location)
     :precondition (and
-      (carrier-robot ?r)
       (carrying ?r ?b)
       (at ?r ?l)
     )
     :effect (and
       (at ?b ?l)
       (not (carrying ?r ?b))
+      (empty-handed ?r)
     )
   )
 
   ;; Fill box with content
   (:action fill-box
-    :parameters (?r ?b ?c ?l)
+    :parameters (?r - carrier-robot ?b - box ?c - content ?l - location)
     :precondition (and
-      (carrier-robot ?r)
-      (box ?b)
-      (content ?c)
       (at ?r ?l)
       (at ?b ?l)
+      (at ?c ?l)
       (empty ?b)
     )
     :effect (and
@@ -96,16 +123,14 @@
 
   ;; Empty box at medical unit
   (:action empty-box
-    :parameters (?r ?b ?c ?u ?l)
+    :parameters (?r - carrier-robot ?b - box ?c - content ?u - location)
     :precondition (and
-      (carrier-robot ?r)
       (carrying ?r ?b)
       (has-content ?b ?c)
-      (at ?r ?l)
-      (at-unit ?u ?l)
+      (at ?r ?u)
     )
     :effect (and
-      (unit-has ?u ?c)
+      (at ?c ?u)
       (empty ?b)
       (not (has-content ?b ?c))
     )
@@ -113,45 +138,41 @@
 
   ;; Deliver full box to medical unit (without unpacking)
   (:action deliver-box
-    :parameters (?r ?b ?u ?l)
+    :parameters (?r - carrier-robot ?b - box ?u - location)
     :precondition (and
-      (carrier-robot ?r)
       (carrying ?r ?b)
-      (at ?r ?l)
-      (at-unit ?u ?l)
+      (at ?r ?u)
     )
     :effect (and
-      (at ?b ?l)
+      (at ?b ?u)
       (not (carrying ?r ?b))
     )
   )
 
   ;; Escorting patients
   (:action pickup-patient
-    :parameters (?r ?p ?l)
+    :parameters (?r - escort-robot ?p - patient ?l - location)
     :precondition (and
-      (escort-robot ?r)
-      (patient ?p)
       (at ?r ?l)
       (at ?p ?l)
+      (empty-handed ?r)
     )
     :effect (and
       (accompanying ?r ?p)
-      (not (at ?p ?l))
+      (not (empty-handed ?r))
     )
   )
 
   (:action drop-patient
-    :parameters (?r ?p ?u ?l)
+    :parameters (?r - escort-robot ?p - patient ?u - location)
     :precondition (and
-      (escort-robot ?r)
       (accompanying ?r ?p)
-      (at ?r ?l)
-      (at-unit ?u ?l)
+      (at ?r ?u)
     )
     :effect (and
       (patient-at-unit ?p ?u)
       (not (accompanying ?r ?p))
+      (empty-handed ?r)
     )
   )
 )
