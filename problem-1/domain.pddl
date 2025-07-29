@@ -47,38 +47,6 @@
     )
   )
 
-  (:action move-with-box
-    :parameters (?r - delivery-robot ?b - box ?from - location ?to - location)
-    :precondition (and
-      (at ?r ?from)
-      (at ?b ?from)
-      (connected ?from ?to)
-      (carrying ?r ?b)
-    )
-    :effect (and
-      (at ?r ?to)
-      (not (at ?r ?from))
-      (at ?b ?to)
-      (not (at ?b ?from))
-    )
-  )
-
-  (:action move-with-patient
-    :parameters (?r - escort-robot ?p - patient ?from - location ?to - location)
-    :precondition (and
-      (at ?r ?from)
-      (at ?p ?from)
-      (connected ?from ?to)
-      (accompanying ?r ?p)
-    )
-    :effect (and
-      (at ?r ?to)
-      (not (at ?r ?from))
-      (at ?p ?to)
-      (not (at ?p ?from))
-    )
-  )
-
   ;; Carrying a box
   (:action pickup-box
     :parameters (?r - delivery-robot ?b - box ?l - location)
@@ -90,9 +58,11 @@
     :effect (and
       (carrying ?r ?b)
       (not (empty-handed ?r))
+      (not (at ?b ?l))
     )
   )
 
+  ;; Drop a box
   (:action drop-box
     :parameters (?r - delivery-robot ?b - box ?l - location)
     :precondition (and
@@ -114,10 +84,12 @@
       (at ?b ?l)
       (at ?c ?l)
       (empty ?b)
+      (empty-handed ?r)
     )
     :effect (and
       (has-content ?b ?c)
       (not (empty ?b))
+      (not (at ?c ?l))
     )
   )
 
@@ -125,27 +97,14 @@
   (:action empty-box
     :parameters (?r - delivery-robot ?b - box ?c - content ?u - location)
     :precondition (and
-      (carrying ?r ?b)
       (has-content ?b ?c)
       (at ?r ?u)
+      (at ?b ?u)
     )
     :effect (and
       (at ?c ?u)
       (empty ?b)
       (not (has-content ?b ?c))
-    )
-  )
-
-  ;; Deliver full box to medical unit (without unpacking)
-  (:action deliver-box
-    :parameters (?r - delivery-robot ?b - box ?u - location)
-    :precondition (and
-      (carrying ?r ?b)
-      (at ?r ?u)
-    )
-    :effect (and
-      (at ?b ?u)
-      (not (carrying ?r ?b))
     )
   )
 
@@ -170,7 +129,7 @@
       (at ?r ?u)
     )
     :effect (and
-      (patient-at-unit ?p ?u)
+      (at ?p ?u)
       (not (accompanying ?r ?p))
       (empty-handed ?r)
     )
