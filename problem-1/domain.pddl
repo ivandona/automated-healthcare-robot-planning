@@ -4,7 +4,7 @@
 
   (:types
     robot box content location patient - object
-    carrier-robot escort-robot - robot
+    delivery-robot escort-robot - robot
     aspirin scalpel tongue-depressor - content
   )
 
@@ -21,7 +21,7 @@
     ;; --- Box State ---
     (has-content ?b - box  ?c - content)
     (empty ?b - box)
-    (carrying ?r - carrier-robot ?b - box)
+    (carrying ?r - delivery-robot ?b - box)
     
     ;; --- Escorting Patients ---
     (accompanying ?r - escort-robot ?p - patient)
@@ -48,7 +48,7 @@
   )
 
   (:action move-with-box
-    :parameters (?r - carrier-robot ?b - box ?from - location ?to - location)
+    :parameters (?r - delivery-robot ?b - box ?from - location ?to - location)
     :precondition (and
       (at ?r ?from)
       (at ?b ?from)
@@ -81,7 +81,7 @@
 
   ;; Carrying a box
   (:action pickup-box
-    :parameters (?r - carrier-robot ?b - box ?l - location)
+    :parameters (?r - delivery-robot ?b - box ?l - location)
     :precondition (and
       (at ?r ?l)
       (at ?b ?l)
@@ -94,7 +94,7 @@
   )
 
   (:action drop-box
-    :parameters (?r - carrier-robot ?b - box ?l - location)
+    :parameters (?r - delivery-robot ?b - box ?l - location)
     :precondition (and
       (carrying ?r ?b)
       (at ?r ?l)
@@ -108,7 +108,7 @@
 
   ;; Fill box with content
   (:action fill-box
-    :parameters (?r - carrier-robot ?b - box ?c - content ?l - location)
+    :parameters (?r - delivery-robot ?b - box ?c - content ?l - location)
     :precondition (and
       (at ?r ?l)
       (at ?b ?l)
@@ -123,7 +123,7 @@
 
   ;; Empty box at medical unit
   (:action empty-box
-    :parameters (?r - carrier-robot ?b - box ?c - content ?u - location)
+    :parameters (?r - delivery-robot ?b - box ?c - content ?u - location)
     :precondition (and
       (carrying ?r ?b)
       (has-content ?b ?c)
@@ -138,7 +138,7 @@
 
   ;; Deliver full box to medical unit (without unpacking)
   (:action deliver-box
-    :parameters (?r - carrier-robot ?b - box ?u - location)
+    :parameters (?r - delivery-robot ?b - box ?u - location)
     :precondition (and
       (carrying ?r ?b)
       (at ?r ?u)
