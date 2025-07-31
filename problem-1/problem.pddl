@@ -11,9 +11,7 @@
     patientbot1 - escort-robot
 
     ;; Contents
-    scalpel1 scalpel2 - scalpel
-    aspirin1 - aspirin
-    tongue-depressor1 tongue-depressor2 - tongue-depressor
+    scalpel tongue-depressor aspirin - content
 
     ;; Boxes
     box1 box2 - box
@@ -24,12 +22,17 @@
 
   ;; INITIAL STATE
   (:init
-    ;; Content types
-    (is-scalpel scalpel1)
-    (is-scalpel scalpel2)
-    (is-aspirin aspirin1)
-    (is-tongue-depressor tongue-depressor1)
-    (is-tongue-depressor tongue-depressor2)
+    (not-warehouse entrance)
+    (not-warehouse facility1)
+    (not-warehouse facility2)
+    (not-warehouse unit11)
+    (not-warehouse unit12)
+    (not-warehouse unit13)
+    (not-warehouse unit14)
+    (not-warehouse unit21)
+    (not-warehouse unit22)
+    (not-warehouse unit23)
+    (not-warehouse unit24)
 
     ;; Connections
     (connected central-warehouse entrance)
@@ -72,11 +75,9 @@
     (empty box2)
 
     ;; Contents
-    (at scalpel1 central-warehouse)
-    (at scalpel2 central-warehouse)
-    (at aspirin1 central-warehouse)
-    (at tongue-depressor1 central-warehouse)
-    (at tongue-depressor2 central-warehouse)
+    (at scalpel central-warehouse)
+    (at aspirin central-warehouse)
+    (at tongue-depressor central-warehouse)
     
     ;; Patients
     (at alice entrance)
@@ -85,11 +86,11 @@
 
   ;; GOALS
   (:goal (and
-    (at scalpel1 unit11)
-    (at aspirin1 unit21)
-    (at tongue-depressor1 unit22)
-    (at tongue-depressor2 unit22)
-    (at alice unit14)
+    (at scalpel unit11)
+    (at scalpel unit13) 
+    (at aspirin unit21)
+    (at tongue-depressor unit22)
+    (at alice unit11)
     (at bob unit24)
   ))
 )
