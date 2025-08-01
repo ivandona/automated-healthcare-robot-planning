@@ -5,6 +5,7 @@
   (:types
     robot box content location patient carrier - object
     delivery-robot escort-robot - robot
+    drone - delivery-robot
   )
 
   (:predicates
@@ -12,11 +13,13 @@
     (at ?x - object ?l - location)
     (connected ?from - location ?to - location)
     (not-warehouse ?l - location)
+    (has-window ?l - location) ; for drone
 
     ;; --- Robot state ---
     (accompanying ?r - escort-robot ?p - patient)
     (has-carrier ?r - delivery-robot ?c - carrier)
     (empty-handed ?r - escort-robot)
+    (not-drone ?r - robot)
 
     ;; --- Carrier state ---
     (has-box ?c - carrier ?b - box)
@@ -41,12 +44,28 @@
     :precondition (and
       (at ?r ?from)
       (connected ?from ?to)
+      (not-drone ?r)
     )
     :effect (and
       (at ?r ?to)
       (not (at ?r ?from))
     )
   )
+
+  ;; Drone can move between any places that have windows
+  (:action move_drone
+    :parameters (?r - drone ?from - location ?to - location)
+    :precondition (and 
+      (at ?r ?from)
+      (has-window ?from)
+      (has-window ?to)
+    )
+    :effect (and 
+      (at ?r ?to)
+      (not (at ?r ?from))
+    )
+  )
+  
 
   ;; Loading a box in the carrier
   (:action pickup-box

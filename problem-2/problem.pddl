@@ -7,10 +7,11 @@
     central-warehouse entrance facility1 facility2 unit11 unit12 unit13 unit14 unit21 unit22 unit23 unit24 - location
 
     ;; Robots and their carriers
-    boxbot1 - delivery-robot
+    boxbot1 boxbot2 - delivery-robot
     patientbot1 - escort-robot
+    drone1 drone2 - drone
 
-    bb1-carrier - carrier
+    bb1-carrier bb2-carrier d1-carrier d2-carrier - carrier
 
     ;; Contents
     scalpel tongue-depressor aspirin - content
@@ -65,9 +66,18 @@
 
     ;; Robots initial state
     (at boxbot1 central-warehouse)
+    (at boxbot2 central-warehouse)
+    (at drone1 central-warehouse)
+    (at drone2 central-warehouse)
     (at patientbot1 entrance)
     (has-carrier boxbot1 bb1-carrier)
+    (has-carrier boxbot2 bb2-carrier)
+    (has-carrier drone1 d1-carrier)
+    (has-carrier drone2 d2-carrier)
     (empty-handed patientbot1)
+    (not-drone boxbot1)
+    (not-drone boxbot2)
+    (not-drone patientbot1)
 
     ;; Carriers
     ;(at bb1-carrier central-warehouse)
@@ -76,6 +86,21 @@
     (not-loaded bb1-carrier box3)
     (not-loaded bb1-carrier box4)
     (not-loaded bb1-carrier box5)
+    (not-loaded bb2-carrier box1)
+    (not-loaded bb2-carrier box2)
+    (not-loaded bb2-carrier box3)
+    (not-loaded bb2-carrier box4)
+    (not-loaded bb2-carrier box5)
+    (not-loaded d1-carrier box1)
+    (not-loaded d1-carrier box2)
+    (not-loaded d1-carrier box3)
+    (not-loaded d1-carrier box4)
+    (not-loaded d1-carrier box5)
+    (not-loaded d2-carrier box1)
+    (not-loaded d2-carrier box2)
+    (not-loaded d2-carrier box3)
+    (not-loaded d2-carrier box4)
+    (not-loaded d2-carrier box5)
 
     ;; Boxes
     (at box1 central-warehouse)
@@ -100,6 +125,12 @@
 
     (= (carrier-capacity bb1-carrier) 3)
     (= (carrier-load bb1-carrier) 0)
+    (= (carrier-capacity bb2-carrier) 3)
+    (= (carrier-load bb2-carrier) 0)
+    (= (carrier-capacity d1-carrier) 1)
+    (= (carrier-load d1-carrier) 0)
+    (= (carrier-capacity d2-carrier) 1)
+    (= (carrier-load d2-carrier) 0)
   )
 
   ;; GOALS
